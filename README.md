@@ -41,13 +41,27 @@ docker compose logs -f pm
 ## 架構
 
 ```
-docker-compose.yml   PM 服務定義（1 個 agent / 1 個 Feishu App）
-agents/pm/SOUL.md    PM 人格（只在首次初始化時種入）
-skills/              共用技能（同上）
-scripts/entrypoint.sh 首次 seed + 啟動
-scripts/backup.sh    從 named volume 導出 tar.gz
-.env.example         參數模板（.env 才是真的，且永不進 git）
+docker-compose.yml    PM 服務定義（1 個 agent / 1 個 Feishu App）
+agents/pm/SOUL.md     PM 人格（首次啟動時種入）
+skills/               共用技能（同上）
+scripts/seed-agent.sh s6 cont-init 鉤子：首次 seed + 寫入 .env
+scripts/backup.sh     從 named volume 導出 tar.gz
+scripts/restore.sh    還原（含回退快照）
+scripts/sync-skills.sh 手動同步技能（預設 dry-run）
+.env.example          參數模板（.env 才是真的，且永不進 git）
 ```
+
+### 首次啟動流程（實測）
+
+```
+image entrypoint (s6-overlay)
+  → /etc/cont-init.d/01-hermes-setup   官方初始化（建 hermes 使用者、bundled skills）
+  → /etc/cont-init.d/99-seed-agent     我們的 seed：SOUL、skills、config、.env、chown
+  → main-wrapper → hermes gateway      以 hermes 使用者身分執行
+```
+
+**關鍵**：不覆蓋映像的 entrypoint。用 s6 的 cont-init 鉤子，讓 root 做完初始化後
+把 `/opt/data` 的擁有者交給 `hermes` 使用者，避免「root 寫的檔案 agent 讀不到」。
 
 ## 安全規則
 

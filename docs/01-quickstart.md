@@ -41,13 +41,18 @@ docker compose logs -f pm
 首次啟動日誌會看到：
 
 ```
-[entrypoint][pm] 首次啟動：初始化 /opt/data
-[entrypoint][pm] 已安裝 SOUL.md
-[entrypoint][pm] 已安裝 skills：agent-handoff pm-orchestration
-[entrypoint][pm] 已產生 config.yaml（model=...）
-[entrypoint][pm] 已寫入 .env（2 個變數）
-[entrypoint][pm] 啟動：hermes gateway
+cont-init: info: running /etc/cont-init.d/01-hermes-setup
+[seed:pm] 首次啟動：套用框架（會覆寫官方預設的 SOUL.md / config.yaml）
+[seed:pm] SOUL.md ← agents/pm/SOUL.md
+[seed:pm] skills：agent-handoff ... pm-orchestration ...
+[seed:pm] config.yaml 已寫入（model=deepseek:deepseek-chat）
+[seed:pm] .env 已寫入（5 個變數）
 ```
+
+> ⚠️ 若在**沒有啟用 Docker Desktop WSL 整合**的發行版裡 clone（例如 WSL 的 `Hermes` 發行版），
+> `compose up` 會報 `can't access specified distro mount service`。
+> 解法：Docker Desktop → Settings → Resources → WSL Integration 勾選該發行版，
+> 或把 repo 放在 Windows 路徑（`C:\...`）下執行。
 
 ## 3. 驗證
 

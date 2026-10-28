@@ -1,0 +1,47 @@
+# 一個 agent（PM）、一個 Feishu App、一個 named volume
+#
+# 啟動：  docker compose up -d
+# 日誌：  docker compose logs -f pm
+# 停止：  docker compose stop
+#
+# 加第二個 agent 時：複製 pm 這個 service，改 AGENT_NAME / container_name /
+# volume 名稱，並在 agents/ 下新增對應的 SOUL.md。
+
+services:
+  pm:
+    image: nousresearch/hermes-agent:stable
+    container_name: hermes-pm
+    restart: unless-stopped
+
+    # 用我們自己的 entrypoint：首次才 seed，之後不覆蓋
+    entrypoint: ["/bin/bash", "/opt/bootstrap/entrypoint.sh"]
+    command: ["gateway"]
+
+    env_file:
+      - .env
+    environment:
+      AGENT_NAME: pm
+      HERMES_HOME: /opt/data
+
+    volumes:
+      # 唯一持有狀態的地方（記憶 / 對話 / 技能演化）
+      - pm-data:/opt/data
+      # 框架（唯讀）：SOUL、skills、腳本
+      - ./agents/pm:/opt/bootstrap/agent:ro
+      - ./skills:/opt/bootstrap/skills:ro
+      - ./scripts:/opt/bootstrap/scripts:ro
+
+    # 給 SQLite 時間做完 checkpoint，避免被硬殺
+    stop_grace_period: 30s
+
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /opt/data/config.yaml || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  pm-data:
+    # 明確命名：compose 重建、專案改名都不會換掉它
+    name: hermes-pm-data

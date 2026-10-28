@@ -1,0 +1,13 @@
+# 秘密與狀態，永不進 git
+.env
+.env.*
+!.env.example
+*.tar.gz
+*.log
+
+# 若你改用 bind mount（不建議），這個資料夾也要排除
+data/
+
+# 系統檔
+.DS_Store
+Thumbs.db

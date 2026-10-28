@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# pre-commit hook — 擋住誤 commit 秘密
+#
+# 安裝（每個 clone 做一次）：
+#   git config core.hooksPath .githooks
+set -euo pipefail
+
+blocked=0
+staged="$(git diff --cached --name-only --diff-filter=ACM)"
+
+# 1. 檔名黑名單
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  case "$f" in
+    .env|*.env|*/.env|auth.json|state.db|*.tar.gz|data/*)
+      echo "✗ 拒絕 commit：$f（秘密或狀態檔，不該進 git）"
+      blocked=1 ;;
+  esac
+done <<< "$staged"
+
+# 2. 內容掃描：常見金鑰樣式
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  [ -f "$f" ] || continue
+  if grep -Iq . "$f" 2>/dev/null; then
+    if grep -nE '(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|cli_a[0-9a-zA-Z]{10,})' "$f" >/dev/null 2>&1; then
+      echo "✗ 拒絕 commit：$f 內容看起來含金鑰"
+      grep -nE '(sk-|ghp_|github_pat_|cli_a)' "$f" | head -3
+      blocked=1
+    fi
+  fi
+done <<< "$staged"
+
+if [ "$blocked" -ne 0 ]; then
+  echo
+  echo "若確認是誤判（例如 .env.example 的空白欄位），用 git commit --no-verify"
+  exit 1
+fi
+
+exit 0

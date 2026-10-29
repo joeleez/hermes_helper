@@ -11,7 +11,10 @@
 
 services:
   pm:
-    image: nousresearch/hermes-agent:stable
+    # 以官方映像為基底，加裝 Feishu 依賴（見 Dockerfile）
+    build:
+      context: .
+    image: hermes-helper-pm:local
     container_name: hermes-pm
     restart: unless-stopped
 

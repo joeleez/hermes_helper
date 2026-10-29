@@ -1,0 +1,6 @@
+# 不要把秘密與狀態送進 build context
+.env
+.env.*
+*.tar.gz
+data/
+.git/

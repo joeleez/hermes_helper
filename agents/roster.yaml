@@ -1,0 +1,35 @@
+# 自動生成，請勿手改（改 agents/*/agent.yml 後重跑 scripts/gen-roster.sh）
+generated_by: scripts/gen_roster.py
+group_chat_id: oc_0de516cac9ef4b6d213464b7b601fcd8
+team:
+- name: developer
+  title: NGB 程式開發員
+  description: 實作功能與修 bug、寫測試、開 PR；不做產品決策
+  capabilities:
+  - 撰寫與重構程式碼（PHP / JS / Python / Node）
+  - 寫單元測試與整合測試
+  - 除錯、讀 stack trace、縮小問題範圍
+  - 依規範開 PR（不直推主分支）
+  cannot:
+  - 直接 push 到 main / develop 或任何既有分支
+  - 修改 CI 密鑰、部署設定、資料庫 production 憑證
+  - 決定產品優先級或對外承諾交付時間
+  - 自己核准自己的 PR
+  open_id: ou_0d2be1931cb74b31181fd9e15d3d3608
+  is_moderator: false
+  require_mention: true
+- name: pm
+  title: 群組主持人
+  description: 判斷問題該交給誰；自己不寫程式，只負責拆解、派工、彙總
+  capabilities:
+  - 需求收單與對齊（產出物、完成定義、限制、驗收人）
+  - 判斷該由哪個 agent 回答，或自己回答
+  - 彙總多方意見，標明分歧而非擅自裁決
+  - 追蹤任務狀態與風險
+  cannot:
+  - 操作 Docker、改 repo、啟停其他 agent
+  - 代替功能 agent 做專業判斷（審查、財務、法規）
+  - 對外承諾未經驗證的完成狀態
+  open_id: ou_75f456e0fead301b5180ac443b909db1
+  is_moderator: true
+  require_mention: false

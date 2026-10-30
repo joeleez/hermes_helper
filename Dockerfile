@@ -14,8 +14,8 @@ USER root
 
 # 映像的 venv 由 uv 建立，沒有 pip；先用 ensurepip 補上
 RUN /opt/hermes/.venv/bin/python -m ensurepip --upgrade >/dev/null 2>&1 \
- && /opt/hermes/.venv/bin/python -m pip install --no-cache-dir --quiet lark-oapi \
- && /opt/hermes/.venv/bin/python -c "import lark_oapi; print('lark_oapi ready')"
+ && /opt/hermes/.venv/bin/python -m pip install --no-cache-dir --quiet lark-oapi pyyaml \
+ && /opt/hermes/.venv/bin/python -c "import lark_oapi, yaml; print('lark_oapi + pyyaml ready')"
 
 # 回到映像預設使用者（官方 entrypoint 會處理 s6 與降權）
 USER root

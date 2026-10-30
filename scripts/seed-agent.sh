@@ -109,6 +109,40 @@ if [ -f "$B/agents/roster.yaml" ]; then
   log "roster.yaml 已同步（$(grep -c '^- name:' "$H/roster.yaml" 2>/dev/null || echo 0) 個成員）"
 fi
 
+# ── 身份：每次啟動重寫，讓 agent 知道「我是誰、群裡有誰」──
+if [ -f "$B/agents/$AGENT_NAME/agent.yml" ]; then
+  if /opt/hermes/.venv/bin/python - "$B/agents" "$AGENT_NAME" "$H" <<'PY' 2>/dev/null; then
+import os, sys, yaml
+agents_dir, name, home = sys.argv[1], sys.argv[2], sys.argv[3]
+me = yaml.safe_load(open(os.path.join(agents_dir, name, "agent.yml"), encoding="utf-8")) or {}
+roster_path = os.path.join(home, "roster.yaml")
+roster = yaml.safe_load(open(roster_path, encoding="utf-8")) if os.path.exists(roster_path) else {}
+team = roster.get("team", [])
+feishu = me.get("feishu") or {}
+identity = {
+    "agent": me.get("name", name),
+    "title": me.get("title", ""),
+    "open_id": feishu.get("open_id", ""),
+    "role": "moderator" if feishu.get("is_moderator") else "specialist",
+    "require_mention": feishu.get("require_mention", True),
+    "group_chat_id": roster.get("group_chat_id", ""),
+    "peers": [m.get("name") for m in team if m.get("name") != me.get("name", name)],
+    "peers_detail": [
+        {"name": m.get("name"), "title": m.get("title"),
+         "description": m.get("description"), "open_id": m.get("open_id")}
+        for m in team if m.get("name") != me.get("name", name)
+    ],
+}
+with open(os.path.join(home, "identity.yaml"), "w", encoding="utf-8") as fh:
+    fh.write("# 由 seed-agent.sh 每次啟動產生，請勿手改\n")
+    yaml.safe_dump(identity, fh, allow_unicode=True, sort_keys=False)
+PY
+    log "identity.yaml 已寫入（role=$([ -f "$H/identity.yaml" ] && grep '^role:' "$H/identity.yaml" | cut -d' ' -f2)）"
+  else
+    log "警告：identity.yaml 產生失敗"
+  fi
+fi
+
 # ── 3. 權限對齊 ────────────────────────────────────
 if id hermes >/dev/null 2>&1; then
   chown -R hermes:hermes "$H" 2>/dev/null || true

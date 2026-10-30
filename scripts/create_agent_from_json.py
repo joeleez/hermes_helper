@@ -82,7 +82,23 @@ def main() -> None:
     secret = form.get("app_secret", "")
     name = form.get("name", "")
     detail = form.get("detail", "")
-    role = (form.get("role") or "specialist").lower()
+    raw_role = (form.get("role") or "工作人員").strip()
+
+    # 接受中文與英文寫法，但只允許兩種可生成的角色
+    ROLE_MAP = {
+        "群組主持人": "moderator", "主持人": "moderator", "moderator": "moderator",
+        "工作人員": "specialist", "專員": "specialist", "員工": "specialist",
+        "specialist": "specialist", "staff": "specialist", "worker": "specialist",
+    }
+    FORBIDDEN = {"後台管理員", "管理員", "operator", "admin"}
+    role_key = raw_role.lower()
+    if role_key in FORBIDDEN:
+        fail("後台管理員是操作者本人（宿主層），不能生成第二個。\n"
+             "  它擁有 Docker 與 repo 寫入權限，只應該有一個。\n"
+             "  如果你要的是『幫你協調的人』，填「群組主持人」。")
+    if role_key not in ROLE_MAP:
+        fail(f"role 只接受「群組主持人」或「工作人員」（也接受 moderator / specialist），收到：{raw_role!r}")
+    role = ROLE_MAP[role_key]
 
     missing = [k for k, v in (("App_ID", app_id), ("App_Secret", secret),
                               ("name", name), ("detail", detail)) if not v]

@@ -1,0 +1,10 @@
+{
+  "_說明": "填完存檔後告訴我「填好了」，我讀取這個檔並建立 agent。用完我會刪掉本檔。",
+  "_name規則": "英文小寫 slug，例如 reviewer、finance（不能中文、不能空格）",
+  "_role規則": "moderator = 群組主持人（不需 @ 也收訊息）；specialist = 專員（只在被 @ 時回應）",
+  "App_ID": "cli_在這裡貼AppID",
+  "App_Secret": "在這裡貼AppSecret",
+  "name": "reviewer",
+  "detail": "一句話說明這個 agent 負責什麼、擅長什麼、不該做什麼",
+  "role": "specialist"
+}

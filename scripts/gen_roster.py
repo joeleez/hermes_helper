@@ -64,6 +64,14 @@ def feishu_members(chat_id: str) -> dict[str, str]:
                      {"app_id": app_id, "app_secret": secret})["tenant_access_token"]
         res = call(f"/open-apis/im/v1/chats/{chat_id}/members?member_id_type=open_id&page_size=100",
                    token=token)
+        # bot 自己通常不會出現在群成員清單裡，另外查
+        try:
+            me = call("/open-apis/bot/v3/info", token=token).get("bot", {})
+            if me.get("open_id"):
+                res.setdefault("data", {}).setdefault("items", []).append(
+                    {"name": me.get("app_name", ""), "member_id": me["open_id"]})
+        except Exception:  # noqa: BLE001
+            pass
     except (urllib.error.HTTPError, urllib.error.URLError, KeyError) as exc:
         print(f"  ! 無法從 Feishu 取得成員（{exc}），保留 agent.yml 內的值", file=sys.stderr)
         return {}

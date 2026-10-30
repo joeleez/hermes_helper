@@ -45,6 +45,8 @@ docker-compose.yml    PM 服務定義（1 個 agent / 1 個 Feishu App）
 agents/pm/SOUL.md     PM 人格（首次啟動時種入）
 skills/               共用技能（同上）
 scripts/seed-agent.sh s6 cont-init 鉤子：首次 seed + 寫入 .env
+scripts/gen-roster.sh 由 agents/*/agent.yml 生成名冊（自動補 open_id）
+scripts/apply-group-rules.sh 讓主持人在指定群「不需 @ 也收訊息」
 scripts/backup.sh     從 named volume 導出 tar.gz
 scripts/restore.sh    還原（含回退快照）
 scripts/sync-skills.sh 手動同步技能（預設 dry-run）

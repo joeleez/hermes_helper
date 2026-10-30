@@ -106,7 +106,7 @@ log ".env 已寫入（$n 個變數）"
 # ── 名冊：每次啟動刷新（由 repo 生成，agent 不會改它）──
 if [ -f "$B/agents/roster.yaml" ]; then
   cp "$B/agents/roster.yaml" "$H/roster.yaml"
-  log "roster.yaml 已同步（$(grep -c '^  - name:' "$H/roster.yaml" 2>/dev/null || echo 0) 個成員）"
+  log "roster.yaml 已同步（$(grep -c '^- name:' "$H/roster.yaml" 2>/dev/null || echo 0) 個成員）"
 fi
 
 # ── 3. 權限對齊 ────────────────────────────────────

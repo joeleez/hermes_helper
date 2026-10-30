@@ -45,6 +45,40 @@ services:
       retries: 3
       start_period: 60s
 
+  developer:
+    # 第二個 agent：NGB 程式開發員（獨立 Feishu App、獨立資料）
+    build:
+      context: .
+    image: hermes-helper-pm:local
+    container_name: hermes-developer
+    restart: unless-stopped
+
+    command: ["gateway"]
+
+    env_file:
+      - .env              # 共用：模型、金鑰、Feishu 通用設定
+      - .env.developer    # 這個 agent 的 App ID / Secret（覆蓋上面的）
+    environment:
+      AGENT_NAME: developer
+      HERMES_HOME: /opt/data
+
+    volumes:
+      - developer-data:/opt/data
+      - ./scripts/seed-agent.sh:/etc/cont-init.d/99-seed-agent:ro
+      - ./agents:/opt/bootstrap/agents:ro
+      - ./skills:/opt/bootstrap/skills:ro
+
+    stop_grace_period: 30s
+
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /opt/data/config.yaml || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
 volumes:
   pm-data:
     name: hermes-pm-data
+  developer-data:
+    name: hermes-developer-data

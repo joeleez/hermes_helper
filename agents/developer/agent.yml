@@ -13,7 +13,7 @@ cannot:
   - 自己核准自己的 PR
 feishu:
   # 由 scripts/gen-roster.sh 自動填入
-  open_id: ""
+  open_id: "ou_0d2be1931cb74b31181fd9e15d3d3608"
   is_moderator: false
   # 只在被 @ 時回應（主持人或人類）
   require_mention: true

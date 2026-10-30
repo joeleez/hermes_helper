@@ -12,7 +12,7 @@ cannot:
   - 對外承諾未經驗證的完成狀態
 feishu:
   # 由 scripts/gen-roster.sh 自動填入（需 im:chat.members:read 權限）
-  open_id: ""
+  open_id: "ou_75f456e0fead301b5180ac443b909db1"
   is_moderator: true
   # 沒被 @ 也要收到群訊息，才能判斷該交給誰
   require_mention: false

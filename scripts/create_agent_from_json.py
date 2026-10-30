@@ -81,7 +81,17 @@ def main() -> None:
     app_id = form.get("app_id", "")
     secret = form.get("app_secret", "")
     name = form.get("name", "")
-    detail = form.get("detail", "")
+
+    # 「職責」欄位接受多種寫法（中英文都收）
+    DUTY_KEYS = ("職責與專長", "職責", "責任", "專長", "工作範圍",
+                 "detail", "description", "responsibilities", "duty")
+    detail = ""
+    for k in DUTY_KEYS:
+        key = k.strip().lower().replace(" ", "_")
+        if form.get(key):
+            detail = form[key]
+            break
+
     raw_role = (form.get("role") or "工作人員").strip()
 
     # 接受中文與英文寫法，但只允許兩種可生成的角色
@@ -101,7 +111,7 @@ def main() -> None:
     role = ROLE_MAP[role_key]
 
     missing = [k for k, v in (("App_ID", app_id), ("App_Secret", secret),
-                              ("name", name), ("detail", detail)) if not v]
+                              ("name", name)) if not v]
     if missing:
         fail(f"表單缺少欄位：{', '.join(missing)}")
     if not re.fullmatch(r"[a-z][a-z0-9_-]*", name):
@@ -111,7 +121,12 @@ def main() -> None:
     if "在這裡貼" in app_id or "在這裡貼" in secret:
         fail("表單仍是預設範例值，請填入真實的 App ID / Secret")
 
-    title = form.get("title") or detail.split("，")[0][:20]
+    if not detail:
+        detail = "（待補：負責什麼、擅長什麼、不該做什麼）"
+        print("! 表單的「職責與專長」是空的 —— agent 仍會建立，但主持人在群裡無法判斷該不該派給它。\n"
+              "  上線後把職責告訴我，我更新 agents/<name>/agent.yml 再重建名冊即可。")
+
+    title = form.get("title") or (detail.split("，")[0][:20] if not detail.startswith("（待補") else name)
 
     if args.dry_run:
         print("（dry-run：跳過憑證驗證）")

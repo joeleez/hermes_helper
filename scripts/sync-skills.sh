@@ -36,8 +36,8 @@ fi
 echo
 for src in "$REPO_DIR"/skills/*/; do
   name="$(basename "$src")"
-  docker exec "$CONTAINER" sh -c "[ -d /opt/data/skills/$name ] && mv /opt/data/skills/$name /opt/data/skills/$name.bak-$STAMP" || true
+  docker exec "$CONTAINER" sh -c "mkdir -p /opt/data/.skill-backups && [ -d /opt/data/skills/$name ] && mv /opt/data/skills/$name /opt/data/.skill-backups/$name.bak-$STAMP" || true
   docker cp "$src" "$CONTAINER:/opt/data/skills/$name"
   echo "  已同步 $name"
 done
-echo "完成。備份在 /opt/data/skills/*.bak-$STAMP"
+echo "完成。備份在 /opt/data/.skill-backups/"

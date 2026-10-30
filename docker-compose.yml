@@ -32,8 +32,8 @@ services:
       - pm-data:/opt/data
       # 首次啟動 seed（root 執行，結束後 chown 給 hermes）
       - ./scripts/seed-agent.sh:/etc/cont-init.d/99-seed-agent:ro
-      # 框架內容（唯讀）
-      - ./agents/pm:/opt/bootstrap/agent:ro
+      # 框架內容（唯讀）：整個 agents/ 目錄，含名冊與各角色 SOUL
+      - ./agents:/opt/bootstrap/agents:ro
       - ./skills:/opt/bootstrap/skills:ro
 
     stop_grace_period: 30s

@@ -31,11 +31,11 @@ mkdir -p "$H/skills" "$H/memories"
 if [ ! -f "$MARKER" ]; then
   log "首次啟動：套用框架（會覆寫官方預設的 SOUL.md / config.yaml）"
 
-  if [ -f "$B/agent/SOUL.md" ]; then
-    cp "$B/agent/SOUL.md" "$H/SOUL.md"
+  if [ -f "$B/agents/$AGENT_NAME/SOUL.md" ]; then
+    cp "$B/agents/$AGENT_NAME/SOUL.md" "$H/SOUL.md"
     log "SOUL.md ← agents/$AGENT_NAME/SOUL.md"
   else
-    log "警告：找不到 $B/agent/SOUL.md"
+    log "警告：找不到 $B/agents/$AGENT_NAME/SOUL.md"
   fi
 
   if [ -d "$B/skills" ]; then
@@ -102,6 +102,12 @@ done
 mv "$TMP" "$H/.env"
 chmod 600 "$H/.env" 2>/dev/null || true
 log ".env 已寫入（$n 個變數）"
+
+# ── 名冊：每次啟動刷新（由 repo 生成，agent 不會改它）──
+if [ -f "$B/agents/roster.yaml" ]; then
+  cp "$B/agents/roster.yaml" "$H/roster.yaml"
+  log "roster.yaml 已同步（$(grep -c '^  - name:' "$H/roster.yaml" 2>/dev/null || echo 0) 個成員）"
+fi
 
 # ── 3. 權限對齊 ────────────────────────────────────
 if id hermes >/dev/null 2>&1; then

@@ -23,6 +23,7 @@ services:
 
     env_file:
       - .env
+      - .env.pm           # 主持人專屬覆蓋（不需 @ 也收訊息）
     environment:
       AGENT_NAME: pm
       HERMES_HOME: /opt/data
